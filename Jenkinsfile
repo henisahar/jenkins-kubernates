@@ -1,5 +1,9 @@
 pipeline {
     agent any
+    environment {
+        // Optionally, you can define any necessary environment variables here
+        DOCKER_IMAGE = "saharheni/helloworld" // Base name for your Docker image
+    }
     stages {
         stage('Start Pipeline') {
             steps {
@@ -19,7 +23,6 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-
                     withSonarQubeEnv('SonarQube_server') {
                         bat 'mvn sonar:sonar'  // No need to run 'clean package' again
                     }
@@ -31,7 +34,7 @@ pipeline {
                 script {
                     echo 'Building Docker Image...'
 
-                    def dockerImage = docker.build("saharheni/helloworld:${env.BUILD_ID}")
+                    dockerImage = docker.build("${DOCKER_IMAGE}:${env.BUILD_ID}")
                 }
             }
         }
