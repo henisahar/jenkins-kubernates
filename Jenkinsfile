@@ -48,18 +48,11 @@ pipeline {
                 }
             }
         }
-        stage('Deploy to Kubernetes') {
+        stage('Deploying App to Kubernetes') {
             steps {
                 script {
                     echo 'Deploying to Kubernetes...'
-
-                    bat 'kubectl apply -f deployment.yaml'
-
-
-                    bat 'kubectl apply -f service.yaml'
-
-
-                    bat 'kubectl rollout status deployment/hello-world-deployment'
+                    kubernetesDeploy(configs: "deployment.yaml", kubeconfigId: "kubernetes")
                 }
             }
         }
