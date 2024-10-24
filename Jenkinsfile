@@ -24,7 +24,7 @@ pipeline {
             steps {
                 script {
                     withSonarQubeEnv('SonarQube_server') {
-                        bat 'mvn sonar:sonar'  // No need to run 'clean package' again
+                        bat 'mvn sonar:sonar'
                     }
                 }
             }
@@ -33,7 +33,6 @@ pipeline {
             steps {
                 script {
                     echo 'Building Docker Image...'
-
                     dockerImage = docker.build("${DOCKER_IMAGE}:${env.BUILD_ID}")
                 }
             }
@@ -46,6 +45,21 @@ pipeline {
                         dockerImage.push("${env.BUILD_ID}")
                         dockerImage.push("latest")
                     }
+                }
+            }
+        }
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    echo 'Deploying to Kubernetes...'
+
+                    bat 'kubectl apply -f deployment.yaml'
+
+
+                    bat 'kubectl apply -f service.yaml'
+
+
+                    bat 'kubectl rollout status deployment/hello-world-deployment'
                 }
             }
         }
